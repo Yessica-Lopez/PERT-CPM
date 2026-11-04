@@ -81,7 +81,8 @@ public class Proyecto {
                         maxFt = pred.tTemprano;
                     }
                 }
-                act.iTemprano = maxFt; // El Inicio Temprano es el máximo de los Fines Tempranos predecesores
+                act.iTemprano = maxFt;  // El Inicio Temprano es el máximo de los Fines Tempranos predecesores
+            }
             act.tTemprano = act.iTemprano + act.tEsperado; // Fin Temprano
             
             if (act.tTemprano > duracionProyecto) {
