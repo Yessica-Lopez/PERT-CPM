@@ -13,53 +13,49 @@ public class Proyecto {
     }
 
     public void iniciarProyecto() {
-        Scanner scanner = new Scanner(System.in);
-        
-        System.out.print("Ingrese la cantidad de actividades: ");
-        int n = scanner.nextInt();
-        scanner.nextLine(); // Limpiar el buffer
+       Scanner scanner = new Scanner(System.in);
 
-        // 1. Lectura de actividades y sus tiempos
-        for (int i = 0; i < n; i++) {
-            System.out.println("\n--- Actividad " + (i + 1) + " ---");
-            System.out.print("Nombre/ID de la actividad: ");
-            String id = scanner.nextLine();
-            
-            System.out.print("Tiempo Optimista (O): ");
-            double o = scanner.nextDouble();
-            System.out.print("Tiempo Más Probable (M): ");
-            double m = scanner.nextDouble();
-            System.out.print("Tiempo Pesimista (P): ");
-            double p = scanner.nextDouble();
-            scanner.nextLine(); // Limpiar el buffer
+    System.out.print("Ingrese la cantidad de actividades: ");
+    int n = Integer.parseInt(scanner.nextLine().trim());
 
-            Actividad act = new Actividad(id, o, m, p);
-            listaActividades.add(act);
-        }
+    System.out.println("Formato: ID predecesoras O M P . Use - si no tiene.");
+    List<String> predsTexto = new ArrayList<>();
 
-        // 2. Definir predecesoras para cada actividad
-        for (Actividad act : listaActividades) {
-            System.out.print("Ingrese las predecesoras de la actividad " + act.id + " separadas por comas (o presione Enter si no tiene): ");
-            String preds = scanner.nextLine();
-            if (!preds.trim().isEmpty()) {
-                String[] nombresPreds = preds.split(",");
-                for (String nombrePred : nombresPreds) {
-                    nombrePred = nombrePred.trim();
-                    Actividad pAct = buscarActividad(nombrePred);
-                    if (pAct != null) {
-                        act.predecesoras.add(pAct);
-                        pAct.sucesoras.add(act);
-                    }
+    
+    for (int i = 0; i < n; i++) {
+        String[] partes = scanner.nextLine().trim().split("\\s+");
+        String id = partes[0];
+        String preds = partes[1];
+        double o = Double.parseDouble(partes[2]);
+        double m = Double.parseDouble(partes[3]);
+        double p = Double.parseDouble(partes[4]);
+
+        listaActividades.add(new Actividad(id, o, m, p));
+        predsTexto.add(preds);
+    }
+
+    //Enlazar predecesoras
+    for (int i = 0; i < n; i++) {
+        Actividad act = listaActividades.get(i);
+        String preds = predsTexto.get(i);
+        if (!preds.equals("-")) {
+            for (String nombrePred : preds.split(",")) {
+                Actividad pAct = buscarActividad(nombrePred.trim());
+                if (pAct != null) {
+                    act.predecesoras.add(pAct);
+                    pAct.sucesoras.add(act);
                 }
             }
         }
-
-        // Ejecutar los cálculos del método
-        ejecutarPaseAdelante();
-        ejecutarPaseAtras();
-        calcularHolgurasYrutaCritica();
-        mostrarResultados();
     }
+
+    //Ejecutar los cálculos del método
+    ordenarPorDependencias();
+    ejecutarPaseAdelante();
+    ejecutarPaseAtras();
+    calcularHolgurasYrutaCritica();
+    mostrarResultados();
+}
 
     private Actividad buscarActividad(String id) {
         for (Actividad a : listaActividades) {
@@ -69,6 +65,26 @@ public class Proyecto {
         }
         return null;
     }
+    private void ordenarPorDependencias() {
+    List<Actividad> ordenada = new ArrayList<>();
+    List<Actividad> pendientes = new ArrayList<>(listaActividades);
+
+    while (!pendientes.isEmpty()) {
+        boolean avanzo = false;
+        for (Actividad act : new ArrayList<>(pendientes)) {
+            if (ordenada.containsAll(act.predecesoras)) {
+                ordenada.add(act);
+                pendientes.remove(act);
+                avanzo = true;
+            }
+        }
+        if (!avanzo) {
+            System.out.println("Error: hay un ciclo en las dependencias.");
+            System.exit(1);
+        }
+    }
+    listaActividades = ordenada;
+}
 
     private void ejecutarPaseAdelante() {
         for (Actividad act : listaActividades) {
@@ -81,9 +97,9 @@ public class Proyecto {
                         maxFt = pred.tTemprano;
                     }
                 }
-                act.iTemprano = maxFt;  // El Inicio Temprano es el máximo de los Fines Tempranos predecesores
+                act.iTemprano = maxFt;  //El Inicio Temprano es el maximo de los Fines Tempranos predecesores
             }
-            act.tTemprano = act.iTemprano + act.tEsperado; // Fin Temprano
+            act.tTemprano = act.iTemprano + act.tEsperado; //Fin Temprano
             
             if (act.tTemprano > duracionProyecto) {
                 duracionProyecto = act.tTemprano;
@@ -95,7 +111,7 @@ public class Proyecto {
         for (int i = listaActividades.size() - 1; i >= 0; i--) {
             Actividad act = listaActividades.get(i);
             if (act.sucesoras.isEmpty()) {
-                act.tTardio = duracionProyecto; // Última actividad
+                act.tTardio = duracionProyecto; //Ultima actividad
             } else {
                 double minItar = Double.MAX_VALUE;
                 for (Actividad suc : act.sucesoras) {
@@ -103,9 +119,9 @@ public class Proyecto {
                         minItar = suc.iTardio;
                     }
                 }
-                act.tTardio = minItar; // El Fin Tardío es el mínimo de los Inicios Tardíos sucesores
+                act.tTardio = minItar; //El Fin Tardio es el minimo de los inicios Tardios sucesores
             }
-            act.iTardio = act.tTardio - act.tEsperado; // Inicio Tardío
+            act.iTardio = act.tTardio - act.tEsperado; //Inicio Tardio
         }
     }
 
