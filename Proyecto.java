@@ -11,6 +11,13 @@ public class Proyecto {
         duracionProyecto = 0;
         iniciarProyecto();
     }
+    
+    public static void main(String[] args){
+        Proyecto proyectoPERT = new Proyecto();
+
+    }
+
+
 
     public void iniciarProyecto() {
        Scanner scanner = new Scanner(System.in);
