@@ -3,6 +3,7 @@ import java.util.List;
 
 public class Actividad {
     public String id;
+    public String preds; 
     public double tOptimista, tProbable, tPesimista;
     public double tEsperado, varianza, holgura;
     //Tiempos para calcular ruta critica
@@ -14,11 +15,13 @@ public class Actividad {
     public List<Actividad> sucesoras;
 
     // Constructor
-    public Actividad(String id, double tOptimista, double tProbable, double tPesimista) {
+    public Actividad(String id, String preds, double tOptimista, double tProbable, double tPesimista) {
         this.id = id;
+        this.preds = preds;
         this.tOptimista = tOptimista;
         this.tProbable = tProbable;
         this.tPesimista = tPesimista;
+        
         this.predecesoras = new ArrayList<>();
         this.sucesoras = new ArrayList<>();
         this.esCritica = false;

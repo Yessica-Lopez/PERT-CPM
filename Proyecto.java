@@ -13,10 +13,9 @@ public class Proyecto {
     }
     
     public static void main(String[] args){
-        Proyecto proyectoPERT = new Proyecto();
+        new Proyecto();
 
     }
-
 
 
     public void iniciarProyecto() {
@@ -37,7 +36,7 @@ public class Proyecto {
         double m = Double.parseDouble(partes[3]);
         double p = Double.parseDouble(partes[4]);
 
-        listaActividades.add(new Actividad(id, o, m, p));
+        listaActividades.add(new Actividad(id, preds, o, m, p));
         predsTexto.add(preds);
     }
 
@@ -62,6 +61,25 @@ public class Proyecto {
     ejecutarPaseAtras();
     calcularHolgurasYrutaCritica();
     mostrarResultados();
+
+    // Calcula opcionalmente la probabilidad de terminar en un plazo especifico usando distribucion normal
+        System.out.print("\nDeseas calcular la probabilidad para un plazo objetivo? (si/no): ");
+        String respuesta = scanner.next();
+        if (respuesta.equalsIgnoreCase("si") || respuesta.equalsIgnoreCase("si")) {
+            System.out.print("Ingresa el tiempo o plazo objetivo: ");
+            double plazoObjetivo = scanner.nextDouble();
+
+            double desviacionEstandar = calcularDesviacionRutaCritica();
+
+            double z = (plazoObjetivo - duracionProyecto) / desviacionEstandar;
+            double probabilidad = normalCDF(z);
+
+            System.out.println("\n--- CALCULO DE PROBABILIDAD (DISTRIBUCION NORMAL) ---");
+            System.out.printf("Z = (Plazo Objetivo - Duracion) / Desviacion\n");
+            System.out.printf("Z = (%.2f - %.2f) / %.2f = %.2f\n", plazoObjetivo, duracionProyecto, desviacionEstandar, z);
+            System.out.printf("Probabilidad resultante: %.2f%%\n", probabilidad * 100.0);
+        }
+        scanner.close();
 }
 
     private Actividad buscarActividad(String id) {
@@ -139,6 +157,30 @@ public class Proyecto {
                 act.esCritica = true; 
             }
         }
+    }
+
+    private double calcularDesviacionRutaCritica() {
+        double sumaVarianzas = 0;
+        for (Actividad act : listaActividades) {
+            if (act.esCritica) {
+                double desviacionActividad = (act.tPesimista - act.tOptimista) / 6.0;
+                sumaVarianzas += Math.pow(desviacionActividad, 2);
+            }
+        }
+        return Math.sqrt(sumaVarianzas);
+    }
+
+    private double normalCDF(double z) {
+        return 0.5 * (1.0 + erf(z / Math.sqrt(2.0)));
+    }
+
+    private double erf(double z) {
+        double t = 1.0 / (1.0 + 0.5 * Math.abs(z));
+        double ans = 1.0 - t * Math.exp(-z * z - 1.26551223 +
+                t * (1.00002368 + t * (0.37409196 + t * (0.09678418 +
+                t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 +
+                t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+        return z >= 0 ? ans : -ans;
     }
 
     private void mostrarResultados() {
