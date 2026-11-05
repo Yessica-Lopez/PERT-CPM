@@ -16,7 +16,7 @@ public class Proyecto {
         new Proyecto();
 
     }
-
+    
 
     public void iniciarProyecto() {
        Scanner scanner = new Scanner(System.in);
