@@ -122,9 +122,9 @@ public class Proyecto {
                         maxFt = pred.tTemprano;
                     }
                 }
-                act.iTemprano = maxFt;  //El Inicio Temprano es el maximo de los Fines Tempranos predecesores
+                act.iTemprano = maxFt;  //El inicio temprano es el maximo de los predecesores
             }
-            act.tTemprano = act.iTemprano + act.tEsperado; //Fin Temprano
+            act.tTemprano = act.iTemprano + act.tEsperado; //Fin temprano
             
             if (act.tTemprano > duracionProyecto) {
                 duracionProyecto = act.tTemprano;
@@ -144,7 +144,7 @@ public class Proyecto {
                         minItar = suc.iTardio;
                     }
                 }
-                act.tTardio = minItar; //El Fin Tardio es el minimo de los inicios Tardios sucesores
+                act.tTardio = minItar; //El fin tardio es el minimo de los inicios tardios sucesores
             }
             act.iTardio = act.tTardio - act.tEsperado; //Inicio Tardio
         }
@@ -195,15 +195,6 @@ public class Proyecto {
         }
         
         System.out.println("\nDuración total del proyecto: " + duracionProyecto);
-        
-        System.out.print("Ruta Crítica: ");
-        List<String> ruta = new ArrayList<>();
-        for (Actividad act : listaActividades) {
-            if (act.esCritica) {
-                ruta.add(act.id);
-            }
-        }
-        System.out.println(String.join(" -> ", ruta));
         System.out.println("=====================================================================================");
     }
 }
