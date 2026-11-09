@@ -189,10 +189,22 @@ public class Proyecto {
                 "Actividad", "Te", "Ti", "FT", "ITar", "FTar", "Holgura", "Crítico");
         System.out.println("-------------------------------------------------------------------------------------");
         
+        double sumaVarianzaCritica = 0;
         for (Actividad act : listaActividades) {
             System.out.printf("%-10s | %-6.2f | %-6.2f | %-6.2f | %-6.2f | %-6.2f | %-8.2f | %-8s\n",
                     act.id, act.tEsperado, act.iTemprano, act.tTemprano, act.iTardio, act.tTardio, act.holgura, (act.esCritica ? "Sí" : "No"));
+
+                    if (act.esCritica) {
+                sumaVarianzaCritica += Math.pow((act.tPesimista - act.tOptimista) / 6.0, 2);
+            }
         }
+        System.out.println("=====================================================================================");
+
+        double desviacionEstandar = Math.sqrt(sumaVarianzaCritica);
+        System.out.println("\n--- ESTADISTICAS FINALES ---");
+        System.out.printf("Duracion total del proyecto: %.2f\n", duracionProyecto);
+        System.out.printf("Suma de varianzas (ruta critica): %.2f\n", sumaVarianzaCritica);
+        System.out.printf("Desviacion estandar: %.2f\n", desviacionEstandar);
         
         System.out.println("\nDuración total del proyecto: " + duracionProyecto);
         System.out.println("=====================================================================================");
